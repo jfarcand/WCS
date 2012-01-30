@@ -6,6 +6,6 @@ An Asynchronous WebSocket Client Library for Scala
         def onMessage(message: String) {
             // Do something
         }
-      }).sendMessage("Hello World");
+     }).sendMessage("Hello World");
 
 
