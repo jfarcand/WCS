@@ -19,5 +19,6 @@ You can also add message Serializer and Deserializer and typed listener
        .deserializer(new MyMessageDeserializer())
        .send("Hello World");
 
+Join our mailing list
 
 
