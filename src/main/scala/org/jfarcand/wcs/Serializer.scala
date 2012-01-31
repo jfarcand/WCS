@@ -15,6 +15,10 @@
 */
 package org.jfarcand.wcs
 
-trait Serializer {
+import com.wordnik.swagger.core.util.JsonUtil
 
+trait Serializer {
+  def serialize(obj:Any):String = {
+    JsonUtil.getJsonMapper.writeValueAsString(obj)
+  }
 }
