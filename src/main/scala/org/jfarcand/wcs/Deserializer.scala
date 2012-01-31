@@ -18,7 +18,5 @@ package org.jfarcand.wcs
 import com.wordnik.swagger.core.util.JsonUtil
 
 trait Deserializer {
-  def convertJson(str: String, cls: Class[_]) = {
-    JsonUtil.getJsonMapper.readValue(str, cls)
-  }
+  def deserialize(str: String, cls: Class[_])
 }
