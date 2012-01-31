@@ -15,32 +15,34 @@
 */
 package org.jfarcand.wcs
 
-import com.ning.http.client.AsyncHttpClient
 import com.ning.http.client.websocket.{ WebSocket, WebSocketTextListener, WebSocketUpgradeHandler }
+import com.ning.http.client.filter.{FilterContext, ResponseFilter}
+import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 
-class WebSocket[Serializer, Deserializer](o: Options) {
+class WebSocket(o: Options) {
 
-  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient()
+  val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
+  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
   var webSocket: com.ning.http.client.websocket.WebSocket = null
-  var webSocketListener: WebSocketTextListener = new Wrapper(new MessageListener() {
+  var webSocketListener: WebSocketTextListener = new Wrapper(new MessageListener[String]() {
     override def onMessage(s: String) {
     }
   })
 
   def this() = this(null)
 
-  def open(s: String): WebSocket[_,_] = {
+  def open(s: String): WebSocket = {
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(webSocketListener).build).get
     this
   }
 
-  def close(): WebSocket[_,_] = {
+  def close(): WebSocket = {
     webSocket.close();
     asyncHttpClient.close()
     this
   }
 
-  def listener(l: MessageListener): WebSocket[_,_] = {
+  def listener(l: MessageListener[_]): WebSocket = {
     if (webSocket.isOpen) {
       webSocket.addMessageListener(new Wrapper(l))
     } else {
@@ -50,13 +52,13 @@ class WebSocket[Serializer, Deserializer](o: Options) {
     this
   }
 
-  def send(s: String): WebSocket[_,_] = {
+  def send(s: String): WebSocket = {
     webSocket.sendTextMessage(s)
     this
   }
 }
 
-private class Wrapper(l: MessageListener) extends WebSocketTextListener {
+private class Wrapper(l: MessageListener[_]) extends WebSocketTextListener {
 
   override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
@@ -71,9 +73,12 @@ private class Wrapper(l: MessageListener) extends WebSocketTextListener {
   }
 
   override def onMessage(s: String) {
+
+    // BUILD FAILS
     l.onMessage(s)
   }
 
   override def onFragment(fragment: String, last: Boolean) {}
 }
+
 

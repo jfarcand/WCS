@@ -66,7 +66,7 @@ class WebsocketTest() extends BaseTest {
 
   @Test
   def testBasicWebSocket() {
-    val w = new WebSocket[JsonSerializer, JsonDeserializer]();
+    val w = new WebSocket();
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)

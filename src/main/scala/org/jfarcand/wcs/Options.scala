@@ -17,4 +17,6 @@ package org.jfarcand.wcs
 
 class Options {
 
+  var connectionTimeout = -1
+
 }

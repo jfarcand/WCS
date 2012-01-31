@@ -20,11 +20,11 @@ class SerializerTest extends FlatSpec with ShouldMatchers {
       def this() = this(null, null, null)
     }
 
-    val serializer = new JsonSerializer
+    //val serializer = new JsonSerializer
     val simpleObject = new SimpleObject("rock", "paper", new java.util.Date())
 
-    val json = serializer.serialize(simpleObject)
-    println(json)
+   // val json = serializer.serialize(simpleObject)
+  //println(json)
   }
   
   
