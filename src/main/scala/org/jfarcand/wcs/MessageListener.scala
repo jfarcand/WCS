@@ -15,7 +15,7 @@
 */
 package org.jfarcand.wcs
 
-trait WebsocketTextListener {
+trait MessageListener {
 
    def onOpen() {}
 

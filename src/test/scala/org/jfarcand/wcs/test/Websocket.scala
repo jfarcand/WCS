@@ -17,16 +17,17 @@
 package org.jfarcand.wcs.test
 
 import org.testng.annotations.Test
-import org.jfarcand.wcs.{WebsocketTextListener, Websocket}
+import org.jfarcand.wcs.{MessageListener, WebSocket}
 import java.io.IOException
-import org.eclipse.jetty.websocket.WebSocket
 import javax.servlet.http.HttpServletRequest
-import org.testng.Assert;
+import org.testng.Assert
+import java.util.concurrent.CountDownLatch
+;
 
 class WebsocketTest() extends BaseTest {
 
   private final class EchoTextWebSocket extends org.eclipse.jetty.websocket.WebSocket with org.eclipse.jetty.websocket.WebSocket.OnTextMessage {
-    def onOpen(connection: WebSocket.Connection): Unit = {
+    def onOpen(connection: org.eclipse.jetty.websocket.WebSocket.Connection): Unit = {
       this.connection = connection
       connection.setMaxTextMessageSize(1000)
     }
@@ -53,12 +54,12 @@ class WebsocketTest() extends BaseTest {
       }
     }
 
-    private var connection: WebSocket.Connection = null
+    private var connection: org.eclipse.jetty.websocket.WebSocket.Connection = null
   }
 
   def getWebSocketHandler: BaseTest#WebSocketHandler = {
     return new WebSocketHandler {
-      def doWebSocketConnect(httpServletRequest: HttpServletRequest, s: String): WebSocket = {
+      def doWebSocketConnect(httpServletRequest: HttpServletRequest, s: String): org.eclipse.jetty.websocket.WebSocket = {
         return new EchoTextWebSocket
       }
     }
@@ -66,18 +67,20 @@ class WebsocketTest() extends BaseTest {
 
   @Test
   def testBasicWebSocket() {
-    val w: Websocket = new Websocket();
+    val w: WebSocket = new WebSocket();
 
     var s = "";
-    Cound
-    w.open(getTargetUrl).listener(new WebsocketTextListener() {
+    var latch : CountDownLatch = new CountDownLatch(1)
+    w.open(getTargetUrl).listener(new MessageListener() {
 
       def onMessage(message: String) {
         s = message
+        latch.countDown()
       }
 
-    }).sendMessage("foo");
+    }).send("foo");
 
+    latch.await()
     Assert.assertEquals(s, "foo")
   }
 }

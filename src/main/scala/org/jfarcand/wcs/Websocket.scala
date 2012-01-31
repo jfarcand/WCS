@@ -16,51 +16,66 @@
 package org.jfarcand.wcs
 
 import com.ning.http.client.AsyncHttpClient
-import com.ning.http.client.websocket.{WebSocketTextListener, WebSocket, WebSocketUpgradeHandler}
-class Websocket(o: Options) {
+import com.ning.http.client.websocket.{WebSocket, WebSocketTextListener, WebSocketUpgradeHandler}
+
+class WebSocket(o: Options) {
 
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient()
-  var webSocket: WebSocket = null
-  var webSocketListener: WebSocketTextListener = new Wrapper(new  WebsocketTextListener() {
-        override def onMessage(s: String) {
-        }
-      })
+  var webSocket: com.ning.http.client.websocket.WebSocket = null
+  var webSocketListener: WebSocketTextListener = new Wrapper(new MessageListener() {
+    override def onMessage(s: String) {
+    }
+  })
+  var serializer: Serializer = new Serializer {}
+  var deserializer: Deserializer = new Deserializer {}
 
-  def this() = this(null)
+  def this() = this (null)
 
-  def open(s: String): Websocket = {
+  def open(s: String): WebSocket = {
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(webSocketListener).build).get
-
-    return this
+    this
   }
 
-  def close(): Websocket = {
+  def close(): WebSocket = {
     webSocket.close();
-    return this
+    asyncHttpClient.close()
+    this
   }
 
-  def listener(l: WebsocketTextListener): Websocket = {
+  def listener(l: MessageListener): WebSocket = {
     if (webSocket.isOpen) {
       webSocket.addMessageListener(new Wrapper(l))
     } else {
       webSocketListener = new Wrapper(l);
     }
 
-    return this
+    this
   }
 
-  def sendMessage(s: String) {
+  def send(s: String): WebSocket = {
     webSocket.sendTextMessage(s)
+    this
   }
+
+  def serialize(s: Serializer): WebSocket = {
+    serializer = s;
+    this
+  }
+
+  def deserialize(s: Deserializer): WebSocket = {
+    deserializer = s
+    this
+  }
+
 }
 
-private class Wrapper(l: WebsocketTextListener) extends WebSocketTextListener {
+private class Wrapper(l: MessageListener) extends WebSocketTextListener {
 
-  override def onOpen(websocket: WebSocket) {
+  override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
   }
 
-  override def onClose(websocket: WebSocket) {
+  override def onClose(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onClose()
   }
 
