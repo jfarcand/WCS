@@ -14,8 +14,6 @@ class SerializerTest extends FlatSpec with ShouldMatchers {
   behavior of "Serializer"
 
   it should "serialize an object" in {
-    class JsonSerializer extends Serializer
-
     class SimpleObject(var name: String,
       var value: String,
       var date: java.util.Date = new java.util.Date) {
@@ -28,4 +26,6 @@ class SerializerTest extends FlatSpec with ShouldMatchers {
     val json = serializer.serialize(simpleObject)
     println(json)
   }
+  
+  
 }
