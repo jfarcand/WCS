@@ -17,12 +17,13 @@
 package org.jfarcand.wcs.test
 
 import org.testng.annotations.Test
-import org.jfarcand.wcs.{MessageListener, WebSocket}
+import org.jfarcand.wcs._
+
 import java.io.IOException
-import javax.servlet.http.HttpServletRequest
-import org.testng.Assert
 import java.util.concurrent.CountDownLatch
-;
+import javax.servlet.http.HttpServletRequest
+
+import org.testng.Assert
 
 class WebsocketTest() extends BaseTest {
 
@@ -39,13 +40,11 @@ class WebsocketTest() extends BaseTest {
     def onMessage(s: String): Unit = {
       try {
         connection.sendMessage(s)
-      }
-      catch {
+      } catch {
         case e: IOException => {
           try {
             connection.sendMessage("FAIL")
-          }
-          catch {
+          } catch {
             case e1: IOException => {
               e1.printStackTrace
             }
@@ -67,10 +66,10 @@ class WebsocketTest() extends BaseTest {
 
   @Test
   def testBasicWebSocket() {
-    val w: WebSocket = new WebSocket();
+    val w = new WebSocket[JsonSerializer, JsonDeserializer]();
 
     var s = "";
-    var latch : CountDownLatch = new CountDownLatch(1)
+    var latch: CountDownLatch = new CountDownLatch(1)
     w.open(getTargetUrl).listener(new MessageListener() {
 
       def onMessage(message: String) {

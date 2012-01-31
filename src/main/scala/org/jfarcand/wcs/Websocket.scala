@@ -16,9 +16,9 @@
 package org.jfarcand.wcs
 
 import com.ning.http.client.AsyncHttpClient
-import com.ning.http.client.websocket.{WebSocket, WebSocketTextListener, WebSocketUpgradeHandler}
+import com.ning.http.client.websocket.{ WebSocket, WebSocketTextListener, WebSocketUpgradeHandler }
 
-class WebSocket(o: Options) {
+class WebSocket[Serializer, Deserializer](o: Options) {
 
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient()
   var webSocket: com.ning.http.client.websocket.WebSocket = null
@@ -26,23 +26,21 @@ class WebSocket(o: Options) {
     override def onMessage(s: String) {
     }
   })
-  var serializer: Serializer = new Serializer {}
-  var deserializer: Deserializer = new Deserializer {}
 
-  def this() = this (null)
+  def this() = this(null)
 
-  def open(s: String): WebSocket = {
+  def open(s: String): WebSocket[_,_] = {
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(webSocketListener).build).get
     this
   }
 
-  def close(): WebSocket = {
+  def close(): WebSocket[_,_] = {
     webSocket.close();
     asyncHttpClient.close()
     this
   }
 
-  def listener(l: MessageListener): WebSocket = {
+  def listener(l: MessageListener): WebSocket[_,_] = {
     if (webSocket.isOpen) {
       webSocket.addMessageListener(new Wrapper(l))
     } else {
@@ -52,21 +50,10 @@ class WebSocket(o: Options) {
     this
   }
 
-  def send(s: String): WebSocket = {
+  def send(s: String): WebSocket[_,_] = {
     webSocket.sendTextMessage(s)
     this
   }
-
-  def serialize(s: Serializer): WebSocket = {
-    serializer = s;
-    this
-  }
-
-  def deserialize(s: Deserializer): WebSocket = {
-    deserializer = s
-    this
-  }
-
 }
 
 private class Wrapper(l: MessageListener) extends WebSocketTextListener {
