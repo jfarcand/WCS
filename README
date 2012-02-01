@@ -1,13 +1,20 @@
-An Asynchronous WebSocket Client Library for Scala
+An Asynchronous WebSocket Client Library for Scala. As simply as
 
      val w: Websocket = new Websocket();
 
-     w.open(getTargetUrl).listener(new MessageListener() {
-        def onMessage(message: String) {
-            // Do something
-        }
-     }).send("Hello World");
+     w.open("ws://localhost")
+        .listener(new MessageListener() {
+            override def onMessage(message: String) {
+                // Do something
+            }
+        })
+        .send("Hello World")
+        .listener(new MessageListener() {
+            override def onMessage(message: Array[Byte]) {
+                // Do something
+            }
+        })
+        .send("Hello World".getBytes);
 
-Join our mailing list
 
 
