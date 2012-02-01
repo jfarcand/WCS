@@ -84,7 +84,7 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
   }
 
   it should "send a text message" in {
-    val w = new WebSocket();
+    val w = new WebSocket()
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)
@@ -95,16 +95,16 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
         latch.countDown()
       }
 
-    }).send("foo");
+    }).send("foo")
 
     latch.await()
     assert(s === "foo")
   }
 
   it should "send a byte message" in {
-    val w = new WebSocket();
+    val w = new WebSocket()
 
-    var s = "";
+    var s = ""
     var latch: CountDownLatch = new CountDownLatch(1)
     w.open(getTargetUrl).listener(new MessageListener() {
 
@@ -113,16 +113,16 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
         latch.countDown()
       }
 
-    }).send("foo".getBytes());
+    }).send("foo".getBytes())
 
     latch.await()
     assert(s === "foo")
   }
 
   it should "wait for an open event" in {
-    val w = new WebSocket();
+    val w = new WebSocket()
 
-    var s : Boolean = false;
+    var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
     w.listener(new MessageListener() {
 
@@ -131,7 +131,29 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
         latch.countDown()
       }
 
-    }).open(getTargetUrl);
+    }).open(getTargetUrl)
+
+    latch.await()
+    assert(s)
+  }
+
+  it should "wait for an close event" in {
+    val w = new WebSocket()
+
+    var s: Boolean = false
+    var latch: CountDownLatch = new CountDownLatch(1)
+    w.listener(new MessageListener() {
+
+      override def onMessage(message: String) {
+        w.close()
+      }
+
+      override def onClose() {
+        s = true
+        latch.countDown()
+      }
+
+    }).open(getTargetUrl).send("foo")
 
     latch.await()
     assert(s)
