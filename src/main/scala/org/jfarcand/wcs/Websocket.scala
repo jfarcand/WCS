@@ -15,23 +15,44 @@
 */
 package org.jfarcand.wcs
 
-import com.ning.http.client.websocket.{ WebSocket, WebSocketTextListener, WebSocketUpgradeHandler }
-import com.ning.http.client.filter.{FilterContext, ResponseFilter}
+import com.ning.http.client.websocket.{WebSocketTextListener, WebSocketUpgradeHandler}
 import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
+import collection.mutable.ListBuffer
+import scala.Predef._
 
 class WebSocket(o: Options) {
 
+  def this() = this (null)
+
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
+  val deserializers = ListBuffer[Deserializer[_]]()
+  val serializers = ListBuffer[Serializer[_]]()
+
   var webSocket: com.ning.http.client.websocket.WebSocket = null
   var webSocketListener: WebSocketTextListener = new Wrapper(new MessageListener[String]() {
     override def onMessage(s: String) {
     }
-  })
+  }, deserializers)
 
-  def this() = this(null)
+  def deserializer(d: Deserializer[_]): WebSocket = {
+    deserializers.append(d)
+    this
+  }
+
+  def serializer(d: Serializer[_]): WebSocket = {
+    serializers.append(d)
+    this
+  }
 
   def open(s: String): WebSocket = {
+    if (deserializers.size == 0) {
+      deserializer(new Deserializer[String]() {
+          def deserialize(str: String) : String = {
+            return str;
+          }
+      })
+    }
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(webSocketListener).build).get
     this
   }
@@ -44,9 +65,9 @@ class WebSocket(o: Options) {
 
   def listener(l: MessageListener[_]): WebSocket = {
     if (webSocket.isOpen) {
-      webSocket.addMessageListener(new Wrapper(l))
+      webSocket.addMessageListener(new Wrapper(l, deserializers))
     } else {
-      webSocketListener = new Wrapper(l);
+      webSocketListener = new Wrapper(l, deserializers);
     }
 
     this
@@ -58,7 +79,7 @@ class WebSocket(o: Options) {
   }
 }
 
-private class Wrapper(l: MessageListener[_]) extends WebSocketTextListener {
+private class Wrapper(l: MessageListener[_], deserializers: ListBuffer[Deserializer[_]]) extends WebSocketTextListener {
 
   override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
@@ -73,9 +94,16 @@ private class Wrapper(l: MessageListener[_]) extends WebSocketTextListener {
   }
 
   override def onMessage(s: String) {
+    for (d <- deserializers) {
+      if (matchd(l, d)) {
+        l.onMessage(d.deserialize(s))
+        return
+      }
+    }
+  }
 
-    // BUILD FAILS
-    l.onMessage(s)
+  def matchd[T: Manifest, U: Manifest](m: MessageListener[T], d: Deserializer[U]): Boolean = {
+    manifest[T] <:< manifest[U]
   }
 
   override def onFragment(fragment: String, last: Boolean) {}

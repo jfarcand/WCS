@@ -71,11 +71,11 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
   }
 
   it should "send a message" in {
-    val w = new WebSocket[JsonSerializer, JsonDeserializer]();
+    val w = new WebSocket();
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.open(getTargetUrl).listener(new MessageListener() {
+    w.open(getTargetUrl).listener(new MessageListener[String]() {
 
       def onMessage(message: String) {
         s = message

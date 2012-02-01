@@ -15,6 +15,6 @@
 */
 package org.jfarcand.wcs
 
-trait Deserializer {
-  def deserialize(str: String, cls: Class[_])
+trait Deserializer[T] {
+  def deserialize(str: String) : T
 }

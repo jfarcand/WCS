@@ -29,12 +29,6 @@ class SerializerTest extends FlatSpec with ShouldMatchers {
     assert(json === """{"name":"rock","value":"paper"}""")
   }
 
-  it should "deserialize an objecct" in {
-    val json = """{"name":"rock","value":"paper"}"""
-    val so = new JsonDeserializer().deserialize(json, classOf[SimpleObject]).asInstanceOf[SimpleObject]
-    assert(so.name == "rock")
-    assert(so.value == "paper")
-  }
 }
 
 class SimpleObject {

@@ -15,6 +15,6 @@
 */
 package org.jfarcand.wcs
 
-trait Serializer {
-  def serialize(obj:Any):String
+trait Serializer[T] {
+  def serialize(obj:Any):T
 }
