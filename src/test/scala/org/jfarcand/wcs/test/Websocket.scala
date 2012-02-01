@@ -118,5 +118,23 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
     latch.await()
     assert(s === "foo")
   }
+
+  it should "wait for an open event" in {
+    val w = new WebSocket();
+
+    var s : Boolean = false;
+    var latch: CountDownLatch = new CountDownLatch(1)
+    w.listener(new MessageListener() {
+
+      override def onOpen() {
+        s = true
+        latch.countDown()
+      }
+
+    }).open(getTargetUrl);
+
+    latch.await()
+    assert(s)
+  }
 }
 

@@ -64,7 +64,7 @@ class WebSocket(o: Options) {
    * Add a {@link MessageListener}
    */
   def listener(l: MessageListener): WebSocket = {
-    if (webSocket.isOpen) {
+    if (webSocket != null && webSocket.isOpen) {
       webSocket.addMessageListener(new TextListenerWrapper(l))
       webSocket.addMessageListener(new BinaryListenerWrapper(l))
     } else {
