@@ -1,4 +1,4 @@
-An Asynchronous WebSocket Client Library for Scala. As simply as
+wCS: An Asynchronous WebSocket Client Library for Scala. As simply as
 
      val w: Websocket = new Websocket();
 
