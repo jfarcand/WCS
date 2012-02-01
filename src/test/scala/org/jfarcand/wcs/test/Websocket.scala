@@ -16,8 +16,6 @@
 
 package org.jfarcand.wcs.test
 
-import org.jfarcand.wcs._
-
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import javax.servlet.http.HttpServletRequest
@@ -27,13 +25,14 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import scala.collection.JavaConversions._
-
 import org.jfarcand.wcs._
 
 @RunWith(classOf[JUnitRunner])
 class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
-  private final class EchoTextWebSocket extends org.eclipse.jetty.websocket.WebSocket with org.eclipse.jetty.websocket.WebSocket.OnTextMessage {
+
+  private final class EchoTextWebSocket extends org.eclipse.jetty.websocket.WebSocket with org.eclipse.jetty.websocket.WebSocket.OnTextMessage with org.eclipse.jetty.websocket.WebSocket.OnBinaryMessage {
+    private var connection: org.eclipse.jetty.websocket.WebSocket.Connection = null
+
     def onOpen(connection: org.eclipse.jetty.websocket.WebSocket.Connection): Unit = {
       this.connection = connection
       connection.setMaxTextMessageSize(1000)
@@ -59,7 +58,21 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
       }
     }
 
-    private var connection: org.eclipse.jetty.websocket.WebSocket.Connection = null
+    def onMessage(data: Array[Byte], offset: Int, length: Int): Unit = {
+      try {
+        connection.sendMessage(data, offset, length)
+      } catch {
+        case e: IOException => {
+          try {
+            connection.sendMessage("FAIL")
+          } catch {
+            case e1: IOException => {
+              e1.printStackTrace
+            }
+          }
+        }
+      }
+    }
   }
 
   def getWebSocketHandler: BaseTest#WebSocketHandler = {
@@ -70,7 +83,7 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
     }
   }
 
-  it should "send a message" in {
+  it should "send a text message" in {
     val w = new WebSocket();
 
     var s = "";
@@ -83,6 +96,24 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
       }
 
     }).send("foo");
+
+    latch.await()
+    assert(s === "foo")
+  }
+
+  it should "send a byte message" in {
+    val w = new WebSocket();
+
+    var s = "";
+    var latch: CountDownLatch = new CountDownLatch(1)
+    w.open(getTargetUrl).listener(new MessageListener() {
+
+      override def onMessage(message: Array[Byte]) {
+        s = new String(message)
+        latch.countDown()
+      }
+
+    }).send("foo".getBytes());
 
     latch.await()
     assert(s === "foo")
