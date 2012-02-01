@@ -79,7 +79,7 @@ class WebSocket(o: Options) {
   }
 }
 
-private class Wrapper(l: MessageListener[_], deserializers: ListBuffer[Deserializer[_]]) extends WebSocketTextListener {
+private class Wrapper[A](l: MessageListener[A], deserializers: ListBuffer[Deserializer[_]]) extends WebSocketTextListener {
 
   override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
@@ -97,7 +97,6 @@ private class Wrapper(l: MessageListener[_], deserializers: ListBuffer[Deseriali
     for (d <- deserializers) {
       if (matchd(l, d)) {
         l.onMessage(d.deserialize(s))
-        return
       }
     }
   }
