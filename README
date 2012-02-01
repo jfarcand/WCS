@@ -8,17 +8,6 @@ An Asynchronous WebSocket Client Library for Scala
         }
      }).send("Hello World");
 
-You can also add message Serializer and Deserializer and typed listener
-
-     w.open(getTargetUrl)
-       .listener(new MessageListener[MyMessage]() {
-          def onMessage(message: MyMessage) {
-                // MyMessage Object
-           }
-         })
-       .deserializer(new MyMessageDeserializer())
-       .send("Hello World");
-
 Join our mailing list
 
 
