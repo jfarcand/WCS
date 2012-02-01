@@ -1,4 +1,9 @@
-package org.jfarcand.wcs.test
+package org.jfarcand.wcs.test.serializer
+
+import com.wordnik.swagger.core.util._
+
+import javax.xml.bind.annotation._
+import org.codehaus.jackson.annotate._
 
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -6,6 +11,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import scala.collection.JavaConversions._
+import scala.reflect.BeanProperty
 
 import org.jfarcand.wcs._
 
@@ -14,18 +20,25 @@ class SerializerTest extends FlatSpec with ShouldMatchers {
   behavior of "Serializer"
 
   it should "serialize an object" in {
-    class SimpleObject(var name: String,
-      var value: String,
-      var date: java.util.Date = new java.util.Date) {
-      def this() = this(null, null, null)
-    }
+    val serializer = new JsonSerializer
+    val simpleObject = new SimpleObject()
+    simpleObject.name = "rock"
+    simpleObject.value = "paper"
 
-    //val serializer = new JsonSerializer
-    val simpleObject = new SimpleObject("rock", "paper", new java.util.Date())
-
-   // val json = serializer.serialize(simpleObject)
-  //println(json)
+    val json = serializer.serialize(simpleObject)
+    assert(json === """{"name":"rock","value":"paper"}""")
   }
-  
-  
+
+  it should "deserialize an objecct" in {
+    val json = """{"name":"rock","value":"paper"}"""
+    val so = new JsonDeserializer().deserialize(json, classOf[SimpleObject]).asInstanceOf[SimpleObject]
+    assert(so.name == "rock")
+    assert(so.value == "paper")
+  }
+}
+
+class SimpleObject {
+  @BeanProperty var name: String = _
+  @BeanProperty var value: String = _
+  @BeanProperty var date: java.util.Date = _
 }

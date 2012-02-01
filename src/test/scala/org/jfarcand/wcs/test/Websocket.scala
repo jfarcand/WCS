@@ -16,17 +16,23 @@
 
 package org.jfarcand.wcs.test
 
-import org.testng.annotations.Test
 import org.jfarcand.wcs._
 
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import javax.servlet.http.HttpServletRequest
 
-import org.testng.Assert
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.FlatSpec
+import org.scalatest.matchers.ShouldMatchers
 
-class WebsocketTest() extends BaseTest {
+import scala.collection.JavaConversions._
 
+import org.jfarcand.wcs._
+
+@RunWith(classOf[JUnitRunner])
+class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
   private final class EchoTextWebSocket extends org.eclipse.jetty.websocket.WebSocket with org.eclipse.jetty.websocket.WebSocket.OnTextMessage {
     def onOpen(connection: org.eclipse.jetty.websocket.WebSocket.Connection): Unit = {
       this.connection = connection
@@ -64,9 +70,8 @@ class WebsocketTest() extends BaseTest {
     }
   }
 
-  @Test
-  def testBasicWebSocket() {
-    val w = new WebSocket();
+  it should "send a message" in {
+    val w = new WebSocket[JsonSerializer, JsonDeserializer]();
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)
@@ -80,7 +85,7 @@ class WebsocketTest() extends BaseTest {
     }).send("foo");
 
     latch.await()
-    Assert.assertEquals(s, "foo")
+    assert(s === "foo")
   }
 }
 
