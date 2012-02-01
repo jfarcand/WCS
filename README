@@ -1,6 +1,6 @@
 wCS: An Asynchronous WebSocket Client Library for Scala. As simply as
 
-     val w: Websocket = new Websocket();
+     val w: Websocket = new Websocket
 
      w.open("ws://localhost")
         .listener(new MessageListener() {
