@@ -28,7 +28,7 @@ import org.scalatest.matchers.ShouldMatchers
 import org.jfarcand.wcs._
 
 @RunWith(classOf[JUnitRunner])
-class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
+class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
   private final class EchoTextWebSocket extends org.eclipse.jetty.websocket.WebSocket with org.eclipse.jetty.websocket.WebSocket.OnTextMessage with org.eclipse.jetty.websocket.WebSocket.OnBinaryMessage {
     private var connection: org.eclipse.jetty.websocket.WebSocket.Connection = null
