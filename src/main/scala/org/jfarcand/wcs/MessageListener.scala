@@ -15,17 +15,30 @@
 */
 package org.jfarcand.wcs
 
+/**
+ * A listener for WebSocket events.
+ */
 trait MessageListener {
-
-   def onOpen() {}
-
-   def onClose() {}
-
-   def onError(t : Throwable) {}
-
-   def onMessage(message : String) {}
-
-   def onMessage(message : Array[Byte]) {}
+  /**
+   * Called when the {@link WebSocket} is opened
+   */
+  def onOpen() {}
+  /**
+   * Called when the {@link WebSocket} is closed
+   */
+  def onClose() {}
+  /**
+   * Called when an unexpected error occurd on a {@link WebSocket}
+   */
+  def onError(t: Throwable) {}
+  /**
+   * Called when a text message is received
+   */
+  def onMessage(message: String) {}
+  /**
+   * Called when a binary message is received.
+   */
+  def onMessage(message: Array[Byte]) {}
 }
 
 

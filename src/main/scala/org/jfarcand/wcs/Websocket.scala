@@ -19,6 +19,10 @@ import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 import scala.Predef._
 import com.ning.http.client.websocket.{WebSocketByteListener, WebSocketTextListener, WebSocketUpgradeHandler}
 
+/**
+ * Simple WebSocket Fluid Client API
+ * <pre> new Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close() </pre>
+ */
 class WebSocket(o: Options) {
 
   def this() = this (null)
@@ -36,6 +40,9 @@ class WebSocket(o: Options) {
     }
   })
 
+  /**
+   * Open a WebSocket connection.
+   */
   def open(s: String): WebSocket = {
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder()
       .addWebSocketListener(textListener)
@@ -44,12 +51,18 @@ class WebSocket(o: Options) {
     this
   }
 
+  /**
+   * Close a WebSocket connection.
+   */
   def close(): WebSocket = {
     webSocket.close();
     asyncHttpClient.close()
     this
   }
 
+  /**
+   * Add a {@link MessageListener}
+   */
   def listener(l: MessageListener): WebSocket = {
     if (webSocket.isOpen) {
       webSocket.addMessageListener(new TextListenerWrapper(l))
@@ -61,11 +74,17 @@ class WebSocket(o: Options) {
     this
   }
 
+  /**
+   * Send a text message.
+   */
   def send(s: String): WebSocket = {
     webSocket.sendTextMessage(s)
     this
   }
 
+  /**
+   * Send a byte message.
+   */
   def send(s: Array[Byte]): WebSocket = {
     webSocket.sendMessage(s)
     this
