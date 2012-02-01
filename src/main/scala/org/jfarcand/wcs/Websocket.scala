@@ -26,33 +26,13 @@ class WebSocket(o: Options) {
 
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
-  val deserializers = ListBuffer[Deserializer[_]]()
-  val serializers = ListBuffer[Serializer[_]]()
-
   var webSocket: com.ning.http.client.websocket.WebSocket = null
-  var webSocketListener: WebSocketTextListener = new Wrapper(new MessageListener[String]() {
+  var webSocketListener: WebSocketTextListener = new Wrapper(new MessageListener() {
     override def onMessage(s: String) {
     }
-  }, deserializers)
-
-  def deserializer(d: Deserializer[_]): WebSocket = {
-    deserializers.append(d)
-    this
-  }
-
-  def serializer(d: Serializer[_]): WebSocket = {
-    serializers.append(d)
-    this
-  }
+  })
 
   def open(s: String): WebSocket = {
-    if (deserializers.size == 0) {
-      deserializer(new Deserializer[String]() {
-        def deserialize(str: String): String = {
-          return str;
-        }
-      })
-    }
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(webSocketListener).build).get
     this
   }
@@ -63,13 +43,12 @@ class WebSocket(o: Options) {
     this
   }
 
-  def listener(l: MessageListener[_]): WebSocket = {
+  def listener(l: MessageListener): WebSocket = {
     if (webSocket.isOpen) {
-      webSocket.addMessageListener(new Wrapper(l, deserializers))
+      webSocket.addMessageListener(new Wrapper(l))
     } else {
-      webSocketListener = new Wrapper(l, deserializers);
+      webSocketListener = new Wrapper(l);
     }
-
     this
   }
 
@@ -79,7 +58,7 @@ class WebSocket(o: Options) {
   }
 }
 
-private class Wrapper(l: MessageListener[_], deserializers: ListBuffer[Deserializer[_]]) extends WebSocketTextListener {
+private class Wrapper(l: MessageListener) extends WebSocketTextListener {
 
   override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
@@ -94,15 +73,7 @@ private class Wrapper(l: MessageListener[_], deserializers: ListBuffer[Deseriali
   }
 
   override def onMessage(s: String) {
-    val objs = deserializers.filter(d => matchd(l, d))
-    objs.size match {
-      case 0 => //oops, nothing can do it
-      case _ => l.onMessage(objs(0).deserialize(s))
-    }
-  }
-
-  def matchd[T: Manifest, U: Manifest](m: MessageListener[T], d: Deserializer[U]): Boolean = {
-    manifest[T] <:< manifest[U]
+    l.onMessage(s)
   }
 
   override def onFragment(fragment: String, last: Boolean) {}

@@ -15,7 +15,7 @@
 */
 package org.jfarcand.wcs
 
-trait MessageListener[T] {
+trait MessageListener {
 
    def onOpen() {}
 
@@ -23,8 +23,9 @@ trait MessageListener[T] {
 
    def onError(t : Throwable) {}
 
-   def onMessage(message : T);
+   def onMessage(message : String) {}
 
+   def onMessage(message : Array[Byte]) {}
 }
 
 

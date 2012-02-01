@@ -75,9 +75,9 @@ class WebsocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.open(getTargetUrl).listener(new MessageListener[String]() {
+    w.open(getTargetUrl).listener(new MessageListener() {
 
-      def onMessage(message: String) {
+      override def onMessage(message: String) {
         s = message
         latch.countDown()
       }
