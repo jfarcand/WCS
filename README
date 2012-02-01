@@ -9,9 +9,10 @@ An Asynchronous WebSocket Client Library for Scala. As simply as
             }
         })
         .send("Hello World")
+        .send("WebSocket are cool!")
         .listener(new MessageListener() {
             override def onMessage(message: Array[Byte]) {
-                // Do something
+                w.send("yo!")
             }
         })
         .send("Hello World".getBytes)
