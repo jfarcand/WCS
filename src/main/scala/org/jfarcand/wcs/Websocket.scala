@@ -48,9 +48,9 @@ class WebSocket(o: Options) {
   def open(s: String): WebSocket = {
     if (deserializers.size == 0) {
       deserializer(new Deserializer[String]() {
-          def deserialize(str: String) : String = {
-            return str;
-          }
+        def deserialize(str: String): String = {
+          return str;
+        }
       })
     }
     webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder().addWebSocketListener(webSocketListener).build).get
@@ -79,7 +79,7 @@ class WebSocket(o: Options) {
   }
 }
 
-private class Wrapper[A](l: MessageListener[A], deserializers: ListBuffer[Deserializer[_]]) extends WebSocketTextListener {
+private class Wrapper(l: MessageListener[_], deserializers: ListBuffer[Deserializer[_]]) extends WebSocketTextListener {
 
   override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
@@ -94,10 +94,10 @@ private class Wrapper[A](l: MessageListener[A], deserializers: ListBuffer[Deseri
   }
 
   override def onMessage(s: String) {
-    for (d <- deserializers) {
-      if (matchd(l, d)) {
-        l.onMessage(d.deserialize(s))
-      }
+    val objs = deserializers.filter(d => matchd(l, d))
+    objs.size match {
+      case 0 => //oops, nothing can do it
+      case _ => l.onMessage(objs(0).deserialize(s))
     }
   }
 
