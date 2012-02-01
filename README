@@ -14,7 +14,8 @@ An Asynchronous WebSocket Client Library for Scala. As simply as
                 // Do something
             }
         })
-        .send("Hello World".getBytes);
+        .send("Hello World".getBytes)
 
+Build the workspace and you are all set! Artifacts will be in Maven Central soon!
 
 
