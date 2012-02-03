@@ -88,7 +88,7 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.open(getTargetUrl).listener(new MessageListener() {
+    w.open(getTargetUrl).listener(new TextListener() {
 
       override def onMessage(message: String) {
         s = message
@@ -106,7 +106,7 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s = ""
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.open(getTargetUrl).listener(new MessageListener() {
+    w.open(getTargetUrl).listener(new BinaryListener() {
 
       override def onMessage(message: Array[Byte]) {
         s = new String(message)
@@ -124,7 +124,7 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.listener(new MessageListener() {
+    w.listener(new TextListener() {
 
       override def onOpen() {
         s = true
@@ -142,7 +142,7 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.listener(new MessageListener() {
+    w.listener(new TextListener() {
 
       override def onMessage(message: String) {
         w.close()

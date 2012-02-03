@@ -31,12 +31,12 @@ class WebSocket(o: Options) {
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
   var webSocket: com.ning.http.client.websocket.WebSocket = null
-  var textListener: WebSocketTextListener = new TextListenerWrapper(new MessageListener() {
+  var textListener: WebSocketTextListener = new TextListenerWrapper(new TextListener() {
     override def onMessage(s: String) {
     }
   })
 
-  var binaryListener: WebSocketByteListener = new BinaryListenerWrapper(new MessageListener() {
+  var binaryListener: WebSocketByteListener = new BinaryListenerWrapper(new BinaryListener() {
     override def onMessage(s: Array[Byte]) {
     }
   })
@@ -66,23 +66,28 @@ class WebSocket(o: Options) {
    */
   def listener(l: MessageListener): WebSocket = {
 
-    textListener = new TextListenerWrapper(l) {
+    if (classOf[TextListener].isAssignableFrom(l.getClass)) {
+      textListener = new TextListenerWrapper(l) {
         override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
           webSocket = w
           super.onOpen(w)
         }
-    }
-
-    binaryListener = new BinaryListenerWrapper(l){
+      }
+    } else {
+      binaryListener = new BinaryListenerWrapper(l) {
         override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
           webSocket = w
           super.onOpen(w)
         }
+      }
     }
 
     if (webSocket != null && webSocket.isOpen) {
-      webSocket.addMessageListener(textListener)
-      webSocket.addMessageListener(binaryListener)
+      if (classOf[TextListener].isAssignableFrom(l.getClass)) {
+        webSocket.addMessageListener(textListener)
+      } else {
+        webSocket.addMessageListener(binaryListener)
+      }
     }
     this
   }
