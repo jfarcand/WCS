@@ -18,6 +18,7 @@ package org.jfarcand.wcs
 import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 import scala.Predef._
 import com.ning.http.client.websocket.{WebSocketByteListener, WebSocketTextListener, WebSocketUpgradeHandler}
+import javax.xml.soap.Text
 
 /**
  * Simple WebSocket Fluid Client API
@@ -64,12 +65,24 @@ class WebSocket(o: Options) {
    * Add a {@link MessageListener}
    */
   def listener(l: MessageListener): WebSocket = {
+
+    textListener = new TextListenerWrapper(l) {
+        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+          webSocket = w
+          super.onOpen(w)
+        }
+    }
+
+    binaryListener = new BinaryListenerWrapper(l){
+        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+          webSocket = w
+          super.onOpen(w)
+        }
+    }
+
     if (webSocket != null && webSocket.isOpen) {
-      webSocket.addMessageListener(new TextListenerWrapper(l))
-      webSocket.addMessageListener(new BinaryListenerWrapper(l))
-    } else {
-      textListener = new TextListenerWrapper(l);
-      binaryListener = new BinaryListenerWrapper(l);
+      webSocket.addMessageListener(textListener)
+      webSocket.addMessageListener(binaryListener)
     }
     this
   }
@@ -93,11 +106,11 @@ class WebSocket(o: Options) {
 
 private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListener {
 
-  override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
+  override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
   }
 
-  override def onClose(websocket: com.ning.http.client.websocket.WebSocket) {
+  override def onClose(w: com.ning.http.client.websocket.WebSocket) {
     l.onClose()
   }
 
