@@ -17,8 +17,9 @@ package org.jfarcand.wcs
 
 import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 import scala.Predef._
-import com.ning.http.client.websocket.{WebSocketByteListener, WebSocketTextListener, WebSocketUpgradeHandler}
-import javax.xml.soap.Text
+import com.ning.http.client.websocket._
+import java.util.concurrent.{TimeUnit, CountDownLatch}
+import collection.mutable.ListBuffer
 
 /**
  * Simple WebSocket Fluid Client API
@@ -31,24 +32,23 @@ class WebSocket(o: Options) {
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
   var webSocket: com.ning.http.client.websocket.WebSocket = null
-  var textListener: WebSocketTextListener = new TextListenerWrapper(new TextListener() {
-    override def onMessage(s: String) {
-    }
-  })
-
-  var binaryListener: WebSocketByteListener = new BinaryListenerWrapper(new BinaryListener() {
-    override def onMessage(s: Array[Byte]) {
-    }
-  })
-
+  var openThrowable: Throwable = null;
+  val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
+  var isOpen = false
   /**
    * Open a WebSocket connection.
    */
   def open(s: String): WebSocket = {
-    webSocket = asyncHttpClient.prepareGet(s).execute(new WebSocketUpgradeHandler.Builder()
-      .addWebSocketListener(textListener)
-      .addWebSocketListener(binaryListener)
-      .build).get
+
+    var b = new WebSocketUpgradeHandler.Builder()
+    listeners.foreach(l => {
+      b.addWebSocketListener(l)
+    })
+
+    webSocket = asyncHttpClient.prepareGet(s).execute(b.build).get()
+    isOpen = true
+    listeners.clear()
+
     this
   }
 
@@ -66,15 +66,17 @@ class WebSocket(o: Options) {
    */
   def listener(l: MessageListener): WebSocket = {
 
+    var wrapper: WebSocketListener = null
+
     if (classOf[TextListener].isAssignableFrom(l.getClass)) {
-      textListener = new TextListenerWrapper(l) {
+      wrapper = new TextListenerWrapper(l) {
         override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
           webSocket = w
           super.onOpen(w)
         }
       }
     } else {
-      binaryListener = new BinaryListenerWrapper(l) {
+      wrapper = new BinaryListenerWrapper(l) {
         override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
           webSocket = w
           super.onOpen(w)
@@ -82,13 +84,13 @@ class WebSocket(o: Options) {
       }
     }
 
-    if (webSocket != null && webSocket.isOpen) {
-      if (classOf[TextListener].isAssignableFrom(l.getClass)) {
-        webSocket.addMessageListener(textListener)
-      } else {
-        webSocket.addMessageListener(binaryListener)
-      }
+    if (isOpen) {
+      webSocket.addMessageListener(wrapper)
+      l.onOpen()
+    } else {
+      listeners.append(wrapper)
     }
+
     this
   }
 
@@ -132,11 +134,11 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
 
 private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteListener {
 
-  override def onOpen(websocket: com.ning.http.client.websocket.WebSocket) {
+  override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
     l.onOpen()
   }
 
-  override def onClose(websocket: com.ning.http.client.websocket.WebSocket) {
+  override def onClose(w: com.ning.http.client.websocket.WebSocket) {
     l.onClose()
   }
 
@@ -148,6 +150,6 @@ private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteLis
     l.onMessage(s)
   }
 
-  override  def onFragment(fragment: Array[Byte], last: Boolean) {}
+  override def onFragment(fragment: Array[Byte], last: Boolean) {}
 }
 
