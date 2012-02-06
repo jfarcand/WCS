@@ -35,6 +35,7 @@ class WebSocket(o: Options) {
   var openThrowable: Throwable = null;
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
   var isOpen = false
+
   /**
    * Open a WebSocket connection.
    */

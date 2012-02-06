@@ -18,5 +18,6 @@ package org.jfarcand.wcs
 class Options {
 
   var connectionTimeout = -1
+  var maxMessageSize = 8192
 
 }
