@@ -85,7 +85,7 @@ class WebSocket(o: Options) {
     }
 
     if (isOpen) {
-      webSocket.addMessageListener(wrapper)
+      webSocket.addWebSocketListener(wrapper)
       l.onOpen()
     } else {
       listeners.append(wrapper)
