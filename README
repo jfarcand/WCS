@@ -17,6 +17,18 @@ wCS: An Asynchronous WebSocket Client Library for Scala. As simply as
         })
         .send("Hello World".getBytes)
 
-Build the workspace and you are all set! Artifacts will be in Maven Central soon!
+Download using Maven
+
+     <dependency>
+         <groupId>org.jfarcand</groupId>
+         <artifactId>wcs</artifactId>
+         <version>0.1-SNAPSHOT</version>
+      </dependency>
+
+or directly
+
+    http://oss.sonatype.org/content/repositories/snapshots
+
+Version 0.1 will be released mid Feburary 2012
 
 
