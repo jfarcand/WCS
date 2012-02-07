@@ -22,13 +22,13 @@ Download using Maven
      <dependency>
          <groupId>org.jfarcand</groupId>
          <artifactId>wcs</artifactId>
-         <version>0.1-SNAPSHOT</version>
+         <version>1.0.0-SNAPSHOT</version>
       </dependency>
 
-or directly
+You can also download an all-in-one jar containing all the required classes from here (wcs-*-all.jar)
 
-    http://oss.sonatype.org/content/repositories/snapshots
+     https://oss.sonatype.org/content/repositories/snapshots/org/jfarcand/wcs/1.0.0-SNAPSHOT/
 
-Version 0.1 will be released mid Feburary 2012
+Version 1.0.0 will be released mid February 2012
 
 
