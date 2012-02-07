@@ -30,7 +30,7 @@ class WebSocket(o: Options) {
   def this() = this (null)
 
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
-  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
+  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.setUserAgent("wCS/1.0").build)
   var webSocket: com.ning.http.client.websocket.WebSocket = null
   var openThrowable: Throwable = null;
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
