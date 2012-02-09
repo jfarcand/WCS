@@ -30,7 +30,14 @@ class WebSocket(o: Options) {
   def this() = this (null)
 
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
-  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.setUserAgent("wCS/1.0").build)
+  config.setUserAgent("wCS/1.0")
+
+  if (o != null) {
+    config.setRequestTimeoutInMs(o.idleTimeout)
+    config.setUserAgent(o.userAgent)
+  }
+
+  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
   var webSocket: com.ning.http.client.websocket.WebSocket = null
   var openThrowable: Throwable = null;
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
@@ -45,7 +52,11 @@ class WebSocket(o: Options) {
       throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// supported" + s)
     }
 
-    var b = new WebSocketUpgradeHandler.Builder()
+    val b = new WebSocketUpgradeHandler.Builder()
+    if (o != null) {
+      b.setMaxTextSize(o.maxMessageSize).setMaxByteSize(o.maxMessageSize).setProtocol(o.protocol)
+    }
+
     listeners.foreach(l => {
       b.addWebSocketListener(l)
     })

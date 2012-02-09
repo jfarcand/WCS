@@ -17,7 +17,20 @@ package org.jfarcand.wcs
 
 class Options {
 
-  var connectionTimeout = -1
+  /**
+   * The maximum idle time of the websocket's connection before it gets closed
+   */
+  var idleTimeout = -1
+  /**
+   * The WebSocket message maximum size
+   */
   var maxMessageSize = 8192
-
+  /**
+   * The User Agent used by this library
+   */
+  var userAgent = "wCS/1.0"
+  /**
+   * The WebSocket protocol.
+   */
+  var protocol = null
 }
