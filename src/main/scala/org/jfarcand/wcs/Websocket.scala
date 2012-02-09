@@ -41,6 +41,10 @@ class WebSocket(o: Options) {
    */
   def open(s: String): WebSocket = {
 
+    if (!s.startsWith("ws://")) {
+      throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// supported" + s)
+    }
+
     var b = new WebSocketUpgradeHandler.Builder()
     listeners.foreach(l => {
       b.addWebSocketListener(l)
