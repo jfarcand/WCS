@@ -1,8 +1,6 @@
 wCS: An Asynchronous WebSocket Client Library for Scala. As simply as
 
-     val w: Websocket = new Websocket
-
-     w.open("ws://localhost")
+     WebSocket().open("ws://localhost")
         .listener(new MessageListener {
             override def onMessage(message: String) {
                 // Do something
@@ -12,7 +10,7 @@ wCS: An Asynchronous WebSocket Client Library for Scala. As simply as
         .send("WebSocket are cool!")
         .listener(new MessageListener {
             override def onMessage(message: Array[Byte]) {
-                w.send("yo!")
+                // Do something
             }
         })
         .send("Hello World".getBytes)

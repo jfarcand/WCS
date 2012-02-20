@@ -25,22 +25,24 @@ import collection.mutable.ListBuffer
  * Simple WebSocket Fluid Client API
  * <pre> new Websocket.open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
  */
-class WebSocket(o: Options) {
-
-  def this() = this (null)
-
+object WebSocket {
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   config.setUserAgent("wCS/1.0")
+  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
 
-  if (o != null) {
-    config.setRequestTimeoutInMs(o.idleTimeout)
-    config.setUserAgent(o.userAgent)
+  def apply(o: Options): WebSocket = {
+    if (o != null) config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
+    new WebSocket(o, None, false, asyncHttpClient)
   }
 
-  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
-  var webSocket: com.ning.http.client.websocket.WebSocket = null
+  def apply(): WebSocket = {
+    new WebSocket(null, None, false, asyncHttpClient)
+  }
+}
+
+class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocket.WebSocket], isOpen: Boolean, asyncHttpClient: AsyncHttpClient) {
+
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
-  var isOpen = false
 
   /**
    * Open a WebSocket connection.
@@ -58,18 +60,16 @@ class WebSocket(o: Options) {
       b.addWebSocketListener(l)
     })
 
-    webSocket = asyncHttpClient.prepareGet(s).execute(b.build).get
-    isOpen = true
     listeners.clear
 
-    this
+    new WebSocket(o, Some(asyncHttpClient.prepareGet(s).execute(b.build).get), true, asyncHttpClient)
   }
 
   /**
    * Close a WebSocket connection.
    */
   def close: WebSocket = {
-    webSocket.close
+    webSocket.foreach(_.close)
     asyncHttpClient.close
     this
   }
@@ -84,21 +84,19 @@ class WebSocket(o: Options) {
     if (classOf[TextListener].isAssignableFrom(l.getClass)) {
       wrapper = new TextListenerWrapper(l) {
         override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
-          webSocket = w
           super.onOpen(w)
         }
       }
     } else {
       wrapper = new BinaryListenerWrapper(l) {
         override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
-          webSocket = w
           super.onOpen(w)
         }
       }
     }
 
     if (isOpen) {
-      webSocket.addWebSocketListener(wrapper)
+      webSocket.get.addWebSocketListener(wrapper)
       l.onOpen
     } else {
       listeners.append(wrapper)
@@ -111,7 +109,9 @@ class WebSocket(o: Options) {
    * Send a text message.
    */
   def send(s: String): WebSocket = {
-    webSocket.sendTextMessage(s)
+    if (!isOpen) throw new WebSocketException("Not Connected", null)
+
+    webSocket.get.sendTextMessage(s)
     this
   }
 
@@ -119,7 +119,9 @@ class WebSocket(o: Options) {
    * Send a byte message.
    */
   def send(s: Array[Byte]): WebSocket = {
-    webSocket.sendMessage(s)
+    if (!isOpen) throw new WebSocketException("Not Connected", null)
+
+    webSocket.get.sendMessage(s)
     this
   }
 }
