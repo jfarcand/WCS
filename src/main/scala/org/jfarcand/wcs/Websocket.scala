@@ -29,20 +29,19 @@ object WebSocket {
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   config.setUserAgent("wCS/1.0")
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
+  val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
 
   def apply(o: Options): WebSocket = {
     if (o != null) config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
-    new WebSocket(o, None, false, asyncHttpClient)
+    new WebSocket(o, None, false, asyncHttpClient, listeners)
   }
 
   def apply(): WebSocket = {
-    new WebSocket(null, None, false, asyncHttpClient)
+    new WebSocket(null, None, false, asyncHttpClient, listeners)
   }
 }
 
-class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocket.WebSocket], isOpen: Boolean, asyncHttpClient: AsyncHttpClient) {
-
-  val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
+case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocket.WebSocket], isOpen: Boolean, asyncHttpClient: AsyncHttpClient, listeners: ListBuffer[WebSocketListener]) {
 
   /**
    * Open a WebSocket connection.
@@ -62,7 +61,7 @@ class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocket.Web
 
     listeners.clear
 
-    new WebSocket(o, Some(asyncHttpClient.prepareGet(s).execute(b.build).get), true, asyncHttpClient)
+    new WebSocket(o, Some(asyncHttpClient.prepareGet(s).execute(b.build).get), true, asyncHttpClient, listeners)
   }
 
   /**
