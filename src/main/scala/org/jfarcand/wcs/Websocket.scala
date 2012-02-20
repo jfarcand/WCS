@@ -23,7 +23,7 @@ import collection.mutable.ListBuffer
 
 /**
  * Simple WebSocket Fluid Client API
- * <pre> new Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close() </pre>
+ * <pre> new Websocket.open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
  */
 class WebSocket(o: Options) {
 
@@ -39,7 +39,6 @@ class WebSocket(o: Options) {
 
   val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
   var webSocket: com.ning.http.client.websocket.WebSocket = null
-  var openThrowable: Throwable = null;
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
   var isOpen = false
 
@@ -48,11 +47,9 @@ class WebSocket(o: Options) {
    */
   def open(s: String): WebSocket = {
 
-    if (!s.startsWith("ws://")) {
-      throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// supported" + s)
-    }
+    if (!s.startsWith("ws://")) throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// supported" + s)
 
-    val b = new WebSocketUpgradeHandler.Builder()
+    val b = new WebSocketUpgradeHandler.Builder
     if (o != null) {
       b.setMaxTextSize(o.maxMessageSize).setMaxByteSize(o.maxMessageSize).setProtocol(o.protocol)
     }
@@ -61,9 +58,9 @@ class WebSocket(o: Options) {
       b.addWebSocketListener(l)
     })
 
-    webSocket = asyncHttpClient.prepareGet(s).execute(b.build).get()
+    webSocket = asyncHttpClient.prepareGet(s).execute(b.build).get
     isOpen = true
-    listeners.clear()
+    listeners.clear
 
     this
   }
@@ -71,9 +68,9 @@ class WebSocket(o: Options) {
   /**
    * Close a WebSocket connection.
    */
-  def close(): WebSocket = {
-    webSocket.close();
-    asyncHttpClient.close()
+  def close: WebSocket = {
+    webSocket.close
+    asyncHttpClient.close
     this
   }
 
@@ -102,7 +99,7 @@ class WebSocket(o: Options) {
 
     if (isOpen) {
       webSocket.addWebSocketListener(wrapper)
-      l.onOpen()
+      l.onOpen
     } else {
       listeners.append(wrapper)
     }
@@ -130,11 +127,11 @@ class WebSocket(o: Options) {
 private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListener {
 
   override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
-    l.onOpen()
+    l.onOpen
   }
 
   override def onClose(w: com.ning.http.client.websocket.WebSocket) {
-    l.onClose()
+    l.onClose
   }
 
   override def onError(t: Throwable) {
@@ -151,11 +148,11 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
 private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteListener {
 
   override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
-    l.onOpen()
+    l.onOpen
   }
 
   override def onClose(w: com.ning.http.client.websocket.WebSocket) {
-    l.onClose()
+    l.onClose
   }
 
   override def onError(t: Throwable) {

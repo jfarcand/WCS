@@ -88,16 +88,16 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s = "";
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.open(getTargetUrl).listener(new TextListener() {
+    w.open(getTargetUrl).listener(new TextListener {
 
       override def onMessage(message: String) {
         s = message
-        latch.countDown()
+        latch.countDown
       }
 
     }).send("foo")
 
-    latch.await()
+    latch.await
     assert(s === "foo")
   }
 
@@ -106,16 +106,16 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s = ""
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.open(getTargetUrl).listener(new BinaryListener() {
+    w.open(getTargetUrl).listener(new BinaryListener {
 
       override def onMessage(message: Array[Byte]) {
         s = new String(message)
-        latch.countDown()
+        latch.countDown
       }
 
-    }).send("foo".getBytes())
+    }).send("foo".getBytes)
 
-    latch.await()
+    latch.await
     assert(s === "foo")
   }
 
@@ -124,16 +124,16 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.listener(new TextListener() {
+    w.listener(new TextListener {
 
-      override def onOpen() {
+      override def onOpen {
         s = true
-        latch.countDown()
+        latch.countDown
       }
 
     }).open(getTargetUrl)
 
-    latch.await()
+    latch.await
     assert(s)
   }
 
@@ -144,14 +144,14 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
     var latch: CountDownLatch = new CountDownLatch(1)
     w.open(getTargetUrl).listener(new TextListener() {
 
-      override def onOpen() {
+      override def onOpen {
         s = true
-        latch.countDown()
+        latch.countDown
       }
 
     })
 
-    latch.await()
+    latch.await
     assert(s)
   }
 
@@ -160,20 +160,20 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
 
     var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
-    w.listener(new TextListener() {
+    w.listener(new TextListener {
 
       override def onMessage(message: String) {
-        w.close()
+        w.close
       }
 
-      override def onClose() {
+      override def onClose {
         s = true
-        latch.countDown()
+        latch.countDown
       }
 
     }).open(getTargetUrl).send("foo")
 
-    latch.await()
+    latch.await
     assert(s)
   }
 }

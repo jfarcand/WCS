@@ -22,11 +22,11 @@ trait MessageListener {
   /**
    * Called when the {@link WebSocket} is opened
    */
-  def onOpen() {}
+  def onOpen {}
   /**
    * Called when the {@link WebSocket} is closed
    */
-  def onClose() {}
+  def onClose {}
   /**
    * Called when an unexpected error occurd on a {@link WebSocket}
    */

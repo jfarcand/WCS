@@ -1,5 +1,3 @@
-package org.jfarcand.wcs
-
 /*
 * Copyright 2012 Jeanfrancois Arcand
 *
@@ -15,6 +13,8 @@ package org.jfarcand.wcs
 * License for the specific language governing permissions and limitations under
 * the License.
 */
+package org.jfarcand.wcs
+
 trait BinaryListener extends MessageListener {
   /**
    * Called when a binary message is received.
