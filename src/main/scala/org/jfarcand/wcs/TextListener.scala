@@ -15,6 +15,9 @@
 */
 package org.jfarcand.wcs
 
+/**
+ * Listen to WebSocket text message
+ */
 trait TextListener extends MessageListener {
   /**
    * Called when a text message is received

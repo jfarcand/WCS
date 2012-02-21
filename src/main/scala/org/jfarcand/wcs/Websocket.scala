@@ -23,7 +23,7 @@ import collection.mutable.ListBuffer
 
 /**
  * Simple WebSocket Fluid Client API
- * <pre> new Websocket.open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
+ * <pre>  Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
  */
 object WebSocket {
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder

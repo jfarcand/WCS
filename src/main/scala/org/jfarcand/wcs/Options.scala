@@ -15,6 +15,9 @@
  */
 package org.jfarcand.wcs
 
+/**
+ * Configure the WebSocket class.
+ */
 class Options {
 
   /**

@@ -15,6 +15,9 @@
 */
 package org.jfarcand.wcs
 
+/**
+ * Listen to WebSocket binary message.
+ */
 trait BinaryListener extends MessageListener {
   /**
    * Called when a binary message is received.
