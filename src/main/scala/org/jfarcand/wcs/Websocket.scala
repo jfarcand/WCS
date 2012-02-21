@@ -28,11 +28,15 @@ import collection.mutable.ListBuffer
 object WebSocket {
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   config.setUserAgent("wCS/1.0")
-  val asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
+  var asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
+
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
 
   def apply(o: Options): WebSocket = {
-    if (o != null) config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
+    if (o != null) {
+      config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
+    }
+    asyncHttpClient = new AsyncHttpClient(config.build)
     new WebSocket(o, None, false, asyncHttpClient, listeners)
   }
 
