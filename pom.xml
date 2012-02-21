@@ -16,9 +16,9 @@
     </description>
     <url>http://github.com/jfarcand/wsc</url>
     <scm>
-        <connection>scm:git:git@github.com:jfarcand/wcs.git</connection>
-        <url>https://github.com/jfarcand/wcs.git</url>
-        <developerConnection>scm:git:git@github.com:jfarcand/wcs.git</developerConnection>
+        <connection>scm:git:git@github.com:jfarcand/WCS.git</connection>
+        <url>https://github.com/jfarcand/WCS.git</url>
+        <developerConnection>scm:git:git@github.com:jfarcand/WCS.git</developerConnection>
     </scm>
     <issueManagement>
         <system>github</system>
