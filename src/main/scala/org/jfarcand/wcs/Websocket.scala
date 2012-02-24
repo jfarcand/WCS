@@ -18,7 +18,6 @@ package org.jfarcand.wcs
 import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 import scala.Predef._
 import com.ning.http.client.websocket._
-import java.util.concurrent.{TimeUnit, CountDownLatch}
 import collection.mutable.ListBuffer
 import org.slf4j.{Logger, LoggerFactory}
 
