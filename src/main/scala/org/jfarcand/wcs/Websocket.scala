@@ -27,7 +27,6 @@ import org.slf4j.{Logger, LoggerFactory}
  * <pre>  Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
  */
 object WebSocket {
-  val logger : Logger = LoggerFactory.getLogger(classOf[WebSocket])
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
   val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   var asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
@@ -47,6 +46,7 @@ object WebSocket {
 }
 
 case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocket.WebSocket], isOpen: Boolean, asyncHttpClient: AsyncHttpClient, listeners: ListBuffer[WebSocketListener]) {
+  val logger : Logger = LoggerFactory.getLogger(classOf[WebSocket])
 
   /**
    * Open a WebSocket connection.
@@ -66,6 +66,7 @@ case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocke
 
     listeners.clear
 
+    logger.trace("Opening to {}", s)
     new WebSocket(o, Some(asyncHttpClient.prepareGet(s).execute(b.build).get), true, asyncHttpClient, listeners)
   }
 
@@ -73,6 +74,8 @@ case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocke
    * Close a WebSocket connection.
    */
   def close: WebSocket = {
+    logger.trace("Closing")
+
     webSocket.foreach(_.close)
     asyncHttpClient.close
     this
@@ -115,6 +118,8 @@ case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocke
   def send(s: String): WebSocket = {
     if (!isOpen) throw new WebSocketException("Not Connected", null)
 
+    logger.trace("Sending to {}", s)
+
     webSocket.get.sendTextMessage(s)
     this
   }
@@ -124,6 +129,8 @@ case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocke
    */
   def send(s: Array[Byte]): WebSocket = {
     if (!isOpen) throw new WebSocketException("Not Connected", null)
+
+    logger.trace("Sending to {}", s)
 
     webSocket.get.sendMessage(s)
     this
