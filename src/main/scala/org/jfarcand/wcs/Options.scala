@@ -23,7 +23,7 @@ class Options {
   /**
    * The maximum idle time of the websocket's connection before it gets closed
    */
-  var idleTimeout = -1
+  var idleTimeout = 60000
   /**
    * The WebSocket message maximum size
    */
