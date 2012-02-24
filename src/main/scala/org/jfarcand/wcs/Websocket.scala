@@ -20,28 +20,29 @@ import scala.Predef._
 import com.ning.http.client.websocket._
 import java.util.concurrent.{TimeUnit, CountDownLatch}
 import collection.mutable.ListBuffer
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
  * Simple WebSocket Fluid Client API
  * <pre>  Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
  */
 object WebSocket {
-  val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
-  config.setUserAgent("wCS/1.0")
-  var asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
-
+  val logger : Logger = LoggerFactory.getLogger(classOf[WebSocket])
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
+  val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
+  var asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
 
   def apply(o: Options): WebSocket = {
     if (o != null) {
       config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
     }
+
     asyncHttpClient = new AsyncHttpClient(config.build)
     new WebSocket(o, None, false, asyncHttpClient, listeners)
   }
 
   def apply(): WebSocket = {
-    new WebSocket(null, None, false, asyncHttpClient, listeners)
+    apply(new Options)
   }
 }
 
