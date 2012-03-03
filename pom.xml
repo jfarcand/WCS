@@ -191,6 +191,14 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.1</version>
             </plugin>
@@ -208,12 +216,77 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmArgs>
+                        <jvmArg>-Xmx384m</jvmArg>
+                    </jvmArgs>
+                    <args>
+                        <arg>-target:jvm-1.5</arg>
+                        <arg>-deprecation</arg>
+                    </args>
+                    <launchers>
+                        <launcher>
+                            <id>run-scalatest</id>
+                            <mainClass>org.scalatest.tools.Runner</mainClass>
+                            <args>
+                                <arg>-p</arg>
+                                <arg>${project.build.testOutputDirectory}</arg>
+                            </args>
+                            <jvmArgs>
+                                <jvmArg>-Xmx512m</jvmArg>
+                            </jvmArgs>
+                        </launcher>
+                    </launchers>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>release-profile</id>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.scala-tools</groupId>
+                        <artifactId>maven-scala-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>compile</goal>
+                                    <goal>testCompile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration/>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <reporting>
+        <outputDirectory>target/site</outputDirectory>
+        <plugins>
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
             </plugin>
         </plugins>
-    </build>
+    </reporting>
     <distributionManagement>
         <repository>
             <id>sonatype-nexus-staging</id>
