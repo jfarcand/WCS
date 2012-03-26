@@ -44,7 +44,12 @@ object WebSocket {
   }
 }
 
-case class WebSocket(o: Options, webSocket: Option[com.ning.http.client.websocket.WebSocket], isOpen: Boolean, asyncHttpClient: AsyncHttpClient, listeners: ListBuffer[WebSocketListener]) {
+case class WebSocket(o: Options,
+                     webSocket: Option[com.ning.http.client.websocket.WebSocket],
+                     isOpen: Boolean,
+                     asyncHttpClient: AsyncHttpClient,
+                     listeners: ListBuffer[WebSocketListener]) {
+
   val logger : Logger = LoggerFactory.getLogger(classOf[WebSocket])
 
   /**
