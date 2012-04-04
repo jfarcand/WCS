@@ -1,7 +1,8 @@
 ### wCS: An Asynchronous WebSocket Client Library for Scala.
 
 As simply as
-```scala
+
+```java
      WebSocket().open("ws://localhost")
         .listener(new MessageListener {
             override def onMessage(message: String) {
@@ -17,21 +18,27 @@ As simply as
         })
         .send("Hello World".getBytes)
 ```
+
 Download using Maven
 
+```xml
      <dependency>
          <groupId>org.jfarcand</groupId>
          <artifactId>wcs</artifactId>
          <version>1.0.0-SNAPSHOT</version>
       </dependency>
+```
 
 or a single artifact that contains all its dependencies
 
+```xml
      <dependency>
          <groupId>org.jfarcand</groupId>
          <artifactId>wcs-all</artifactId>
          <version>1.0.0-SNAPSHOT</version>
       </dependency>
+```
+
 
 
 
