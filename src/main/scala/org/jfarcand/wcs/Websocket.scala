@@ -27,7 +27,7 @@ import org.slf4j.{Logger, LoggerFactory}
  */
 object WebSocket {
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
-  val config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
+  var config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   var asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
 
   def apply(o: Options): WebSocket = {
@@ -35,7 +35,13 @@ object WebSocket {
       config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
     }
 
-    asyncHttpClient = new AsyncHttpClient(config.build)
+    try {
+      asyncHttpClient = new AsyncHttpClient(config.build)
+    } catch {
+      case t : IllegalStateException => {
+        config  = new AsyncHttpClientConfig.Builder
+      }
+    }
     new WebSocket(o, None, false, asyncHttpClient, listeners)
   }
 
