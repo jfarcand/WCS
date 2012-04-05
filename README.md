@@ -1,6 +1,6 @@
 ### wCS: An Asynchronous WebSocket Client Library for Scala.
 
-As simply as
+A really simple WebSocket library that works with [node.js](http://nodejs.org/), [Atmosphere](https://github.com/Atmosphere/atmosphere) or any WebSocket server! As simply as
 
 ```java
      WebSocket().open("ws://localhost")
