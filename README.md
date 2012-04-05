@@ -10,7 +10,7 @@ A really simple WebSocket library that works with [node.js](http://nodejs.org/),
             }
         })
         .send("Hello World")
-        .send("WebSocket are cool!")
+        .send("WebSockets are cool!")
         .listener(new MessageListener {
             override def onMessage(message: Array[Byte]) {
                 // Do something
