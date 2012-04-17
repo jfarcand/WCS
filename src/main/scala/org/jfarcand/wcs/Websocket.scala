@@ -199,7 +199,7 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
   override def equals(o: Any): Boolean = {
     o match {
       case t: TextListenerWrapper => t.hashCode.equals(this.hashCode)
-      case _ => return false
+      case _ => false
     }
   }
 }
@@ -227,7 +227,7 @@ private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteLis
   override def equals(o: Any): Boolean = {
     o match {
       case t: BinaryListenerWrapper => t.hashCode.equals(this.hashCode)
-      case _ => return false
+      case _ => false
     }
   }
 
