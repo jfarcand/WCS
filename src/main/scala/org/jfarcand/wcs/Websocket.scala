@@ -38,8 +38,8 @@ object WebSocket {
     try {
       asyncHttpClient = new AsyncHttpClient(config.build)
     } catch {
-      case t : IllegalStateException => {
-        config  = new AsyncHttpClientConfig.Builder
+      case t: IllegalStateException => {
+        config = new AsyncHttpClientConfig.Builder
       }
     }
     new WebSocket(o, None, false, asyncHttpClient, listeners)
@@ -56,7 +56,7 @@ case class WebSocket(o: Options,
                      asyncHttpClient: AsyncHttpClient,
                      listeners: ListBuffer[WebSocketListener]) {
 
-  val logger : Logger = LoggerFactory.getLogger(classOf[WebSocket])
+  val logger: Logger = LoggerFactory.getLogger(classOf[WebSocket])
 
   /**
    * Open a WebSocket connection.
@@ -123,6 +123,33 @@ case class WebSocket(o: Options,
   }
 
   /**
+   * Remove a {@link MessageListener}
+   */
+  def removeListener(l: MessageListener): WebSocket = {
+    var wrapper: WebSocketListener = null
+
+    if (classOf[TextListener].isAssignableFrom(l.getClass)) {
+      wrapper = new TextListenerWrapper(l) {
+        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+          super.onOpen(w)
+        }
+      }
+    } else {
+      wrapper = new BinaryListenerWrapper(l) {
+        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+          super.onOpen(w)
+        }
+      }
+    }
+    if (isOpen) {
+      webSocket.get.removeWebSocketListener(wrapper)
+    } else {
+      listeners -= wrapper
+    }
+    this
+  }
+
+  /**
    * Send a text message.
    */
   def send(s: String): WebSocket = {
@@ -166,6 +193,15 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
   }
 
   override def onFragment(fragment: String, last: Boolean) {}
+
+  override def hashCode() = l.hashCode
+
+  override def equals(o: Any): Boolean = {
+    o match {
+      case t: TextListenerWrapper => t.hashCode.equals(this.hashCode)
+      case _ => return false
+    }
+  }
 }
 
 private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteListener {
@@ -184,6 +220,15 @@ private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteLis
 
   override def onMessage(s: Array[Byte]) {
     l.onMessage(s)
+  }
+
+  override def hashCode() = l.hashCode
+
+  override def equals(o: Any): Boolean = {
+    o match {
+      case t: BinaryListenerWrapper => t.hashCode.equals(this.hashCode)
+      case _ => return false
+    }
   }
 
   override def onFragment(fragment: Array[Byte], last: Boolean) {}

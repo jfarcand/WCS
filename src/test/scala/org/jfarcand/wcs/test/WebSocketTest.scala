@@ -17,7 +17,6 @@
 package org.jfarcand.wcs.test
 
 import java.io.IOException
-import java.util.concurrent.CountDownLatch
 import javax.servlet.http.HttpServletRequest
 
 import org.junit.runner.RunWith
@@ -26,6 +25,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import org.jfarcand.wcs._
+import java.util.concurrent.{TimeUnit, CountDownLatch}
 
 @RunWith(classOf[JUnitRunner])
 class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
@@ -155,50 +155,116 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
     assert(s)
   }
 
-  it should "wait for an close event" in {
+//  it should "wait for an close event" in {
+//    var w = WebSocket()
+//
+//    var s: Boolean = false
+//    var latch: CountDownLatch = new CountDownLatch(1)
+//    w = w.listener(new TextListener {
+//
+//      override def onMessage(message: String) {
+//        w.close
+//      }
+//
+//      override def onClose {
+//        s = true
+//        latch.countDown
+//      }
+//
+//    }).open(getTargetUrl).send("foo")
+//
+//    latch.await
+//    assert(s)
+//  }
+//
+//  it should "open with an Option" in {
+//    val o = new Options
+//    o.userAgent = "test/1.1"
+//    var w = WebSocket(o)
+//
+//    var s: Boolean = false
+//    var latch: CountDownLatch = new CountDownLatch(1)
+//    w = w.listener(new TextListener {
+//
+//      override def onMessage(message: String) {
+//        w.close
+//      }
+//
+//      override def onClose {
+//        s = true
+//        latch.countDown
+//      }
+//
+//    }).open(getTargetUrl).send("foo")
+//
+//    latch.await
+//    assert(s)
+//  }
+
+  it should "remove a listener" in {
     var w = WebSocket()
 
     var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
-    w = w.listener(new TextListener {
+    val t = new TextListener {
 
       override def onMessage(message: String) {
-        w.close
-      }
-
-      override def onClose {
         s = true
         latch.countDown
       }
 
-    }).open(getTargetUrl).send("foo")
+      override def onClose {
+      }
 
-    latch.await
-    assert(s)
+    }
+    w = w.listener(t).removeListener(t).open(getTargetUrl).send("foo")
+
+    latch.await(1, TimeUnit.SECONDS)
+    assert(!s)
   }
 
-  it should "open with an Option" in {
-    val o = new Options
-    o.userAgent = "test/1.1"
-    var w = WebSocket(o)
+  it should "remove a listener after open" in {
+    var w = WebSocket()
 
     var s: Boolean = false
     var latch: CountDownLatch = new CountDownLatch(1)
-    w = w.listener(new TextListener {
+    val t = new TextListener {
 
       override def onMessage(message: String) {
-        w.close
-      }
-
-      override def onClose {
         s = true
         latch.countDown
       }
 
-    }).open(getTargetUrl).send("foo")
+      override def onClose {
+      }
 
-    latch.await
-    assert(s)
+    }
+    w = w.listener(t).open(getTargetUrl).removeListener(t).send("foo")
+
+    latch.await(1, TimeUnit.SECONDS)
+    assert(!s)
+  }
+
+  it should "remove a listener after receiving a message" in {
+    var w = WebSocket()
+
+    var s: Boolean = false
+    var latch: CountDownLatch = new CountDownLatch(2)
+    val t = new TextListener {
+
+      override def onMessage(message: String) {
+        w.removeListener(this)
+        latch.countDown
+      }
+
+      override def onClose {
+      }
+
+    }
+    w = w.listener(t).open(getTargetUrl).send("foo").send("foo")
+
+    latch.await(1, TimeUnit.SECONDS)
+    assert(latch.getCount == 1)
   }
 }
 
