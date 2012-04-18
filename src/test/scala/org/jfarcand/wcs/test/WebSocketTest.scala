@@ -155,51 +155,51 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
     assert(s)
   }
 
-//  it should "wait for an close event" in {
-//    var w = WebSocket()
-//
-//    var s: Boolean = false
-//    var latch: CountDownLatch = new CountDownLatch(1)
-//    w = w.listener(new TextListener {
-//
-//      override def onMessage(message: String) {
-//        w.close
-//      }
-//
-//      override def onClose {
-//        s = true
-//        latch.countDown
-//      }
-//
-//    }).open(getTargetUrl).send("foo")
-//
-//    latch.await
-//    assert(s)
-//  }
-//
-//  it should "open with an Option" in {
-//    val o = new Options
-//    o.userAgent = "test/1.1"
-//    var w = WebSocket(o)
-//
-//    var s: Boolean = false
-//    var latch: CountDownLatch = new CountDownLatch(1)
-//    w = w.listener(new TextListener {
-//
-//      override def onMessage(message: String) {
-//        w.close
-//      }
-//
-//      override def onClose {
-//        s = true
-//        latch.countDown
-//      }
-//
-//    }).open(getTargetUrl).send("foo")
-//
-//    latch.await
-//    assert(s)
-//  }
+  it should "wait for an close event" in {
+    var w = WebSocket()
+
+    var s: Boolean = false
+    var latch: CountDownLatch = new CountDownLatch(1)
+    w = w.listener(new TextListener {
+
+      override def onMessage(message: String) {
+        w.close
+      }
+
+      override def onClose {
+        s = true
+        latch.countDown
+      }
+
+    }).open(getTargetUrl).send("foo")
+
+    latch.await
+    assert(s)
+  }
+
+  it should "open with an Option" in {
+    val o = new Options
+    o.userAgent = "test/1.1"
+    var w = WebSocket(o)
+
+    var s: Boolean = false
+    var latch: CountDownLatch = new CountDownLatch(1)
+    w = w.listener(new TextListener {
+
+      override def onMessage(message: String) {
+        w.close
+      }
+
+      override def onClose {
+        s = true
+        latch.countDown
+      }
+
+    }).open(getTargetUrl).send("foo")
+
+    latch.await
+    assert(s)
+  }
 
   it should "remove a listener" in {
     var w = WebSocket()

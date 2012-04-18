@@ -20,7 +20,6 @@ import scala.Predef._
 import com.ning.http.client.websocket._
 import collection.mutable.ListBuffer
 import org.slf4j.{Logger, LoggerFactory}
-
 /**
  * Simple WebSocket Fluid Client API
  * <pre>  Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
@@ -28,7 +27,7 @@ import org.slf4j.{Logger, LoggerFactory}
 object WebSocket {
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
   var config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
-  var asyncHttpClient: AsyncHttpClient = new AsyncHttpClient(config.build)
+  var asyncHttpClient: AsyncHttpClient = null
 
   def apply(o: Options): WebSocket = {
     if (o != null) {
@@ -81,14 +80,20 @@ case class WebSocket(o: Options,
   }
 
   /**
-   * Close a WebSocket connection.
+   * Close a WebSocket connection. The WebSocket providers will not get closed. To close it, use {@link #shutDown}
    */
   def close: WebSocket = {
     logger.trace("Closing")
 
     webSocket.foreach(_.close)
-    asyncHttpClient.close
     this
+  }
+
+  /**
+   * Shutdown the underlying WebSocket provider ({@link AsyncHttpClient})
+   */
+  def shutDown {
+    asyncHttpClient.closeAsynchronously
   }
 
   /**
