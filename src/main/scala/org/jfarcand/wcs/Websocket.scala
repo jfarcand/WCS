@@ -20,6 +20,7 @@ import scala.Predef._
 import com.ning.http.client.websocket._
 import collection.mutable.ListBuffer
 import org.slf4j.{Logger, LoggerFactory}
+
 /**
  * Simple WebSocket Fluid Client API
  * <pre>  Websocket().open("ws://localhost".send("Hello").listener(new MyListener() {...}).close </pre>
@@ -179,7 +180,7 @@ case class WebSocket(o: Options,
   }
 }
 
-private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListener {
+private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListener with WebSocketCloseCodeReasonListener {
 
   override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
     l.onOpen
@@ -197,6 +198,10 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
     l.onMessage(s)
   }
 
+  override def onClose(w: com.ning.http.client.websocket.WebSocket, code: Int, reason: String) {
+    l.onClose(code, reason)
+  }
+
   override def onFragment(fragment: String, last: Boolean) {}
 
   override def hashCode() = l.hashCode
@@ -209,7 +214,7 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
   }
 }
 
-private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteListener {
+private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteListener with WebSocketCloseCodeReasonListener {
 
   override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
     l.onOpen
@@ -217,6 +222,10 @@ private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteLis
 
   override def onClose(w: com.ning.http.client.websocket.WebSocket) {
     l.onClose
+  }
+
+  override def onClose(w: com.ning.http.client.websocket.WebSocket, code: Int, reason: String) {
+    l.onClose(code, reason)
   }
 
   override def onError(t: Throwable) {

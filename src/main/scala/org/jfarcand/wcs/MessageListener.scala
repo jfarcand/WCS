@@ -28,6 +28,10 @@ trait MessageListener {
    */
   def onClose {}
   /**
+   * Called when the {@link WebSocket} is closed with its assic
+   */
+  def onClose(code: Int, reason : String) {}
+  /**
    * Called when an unexpected error occurd on a {@link WebSocket}
    */
   def onError(t: Throwable) {}

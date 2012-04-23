@@ -26,6 +26,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 import org.jfarcand.wcs._
 import java.util.concurrent.{TimeUnit, CountDownLatch}
+import java.util.concurrent.atomic.AtomicReference
 
 @RunWith(classOf[JUnitRunner])
 class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
@@ -154,6 +155,29 @@ class WebSocketTest extends BaseTest with FlatSpec with ShouldMatchers {
     latch.await
     assert(s)
   }
+
+  it should "wait for an close event with code" in {
+    var w = WebSocket()
+
+    val s: AtomicReference[String] = new AtomicReference[String]
+    var latch: CountDownLatch = new CountDownLatch(1)
+    w = w.listener(new TextListener {
+
+      override def onMessage(message: String) {
+        w.close
+      }
+
+      override def onClose(code :Int, reason : String) {
+        s.set(code + "-" + reason)
+        latch.countDown
+      }
+
+    }).open(getTargetUrl).send("foo")
+
+    latch.await
+    assert(s.get() == "1000-Normal closure; the connection successfully completed whatever purpose for which it was created.")
+  }
+
 
   it should "wait for an close event" in {
     var w = WebSocket()
