@@ -36,6 +36,7 @@ object WebSocket {
     }
 
     try {
+      config.setFollowRedirects(true)
       asyncHttpClient = new AsyncHttpClient(config.build)
     } catch {
       case t: IllegalStateException => {
