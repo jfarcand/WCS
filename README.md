@@ -25,7 +25,7 @@ Download using Maven
      <dependency>
          <groupId>org.jfarcand</groupId>
          <artifactId>wcs</artifactId>
-         <version>1.0.1</version>
+         <version>1.2</version>
       </dependency>
 ```
 
@@ -35,7 +35,7 @@ or a single artifact that contains all its dependencies
      <dependency>
          <groupId>org.jfarcand</groupId>
          <artifactId>wcs-all</artifactId>
-         <version>1.0.1</version>
+         <version>1.2</version>
       </dependency>
 ```
 
