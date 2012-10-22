@@ -64,7 +64,7 @@ case class WebSocket(o: Options,
    */
   def open(s: String): WebSocket = {
 
-    if (!s.startsWith("ws://")) throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// supported" + s)
+    if (!s.startsWith("ws://") && !s.startsWith("wss://")) throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// or wss:// supported" + s)
 
     val b = new WebSocketUpgradeHandler.Builder
     if (o != null) {
