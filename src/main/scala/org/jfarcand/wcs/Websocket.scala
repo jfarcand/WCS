@@ -15,9 +15,10 @@
 */
 package org.jfarcand.wcs
 
+import com.ning.http.client.providers.netty.NettyAsyncHttpProviderConfig
 import com.ning.http.client.{AsyncHttpClientConfig, AsyncHttpClient}
 import scala.Predef._
-import com.ning.http.client.websocket._
+import com.ning.http.client.ws._
 import collection.mutable.ListBuffer
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -27,16 +28,19 @@ import org.slf4j.{Logger, LoggerFactory}
  */
 object WebSocket {
   val listeners: ListBuffer[WebSocketListener] = ListBuffer[WebSocketListener]()
+  var nettyConfig: NettyAsyncHttpProviderConfig = new NettyAsyncHttpProviderConfig
   var config: AsyncHttpClientConfig.Builder = new AsyncHttpClientConfig.Builder
   var asyncHttpClient: AsyncHttpClient = null
 
   def apply(o: Options): WebSocket = {
     if (o != null) {
-      config.setRequestTimeoutInMs(o.idleTimeout).setUserAgent(o.userAgent)
+      nettyConfig.setWebSocketMaxBufferSize(o.maxMessageSize)
+      nettyConfig.setWebSocketMaxBufferSize(o.maxMessageSize)
+      config.setRequestTimeout(o.idleTimeout).setUserAgent(o.userAgent).setAsyncHttpClientProviderConfig(nettyConfig)
     }
 
     try {
-      config.setFollowRedirects(true)
+      config.setFollowRedirect(true)
       asyncHttpClient = new AsyncHttpClient(config.build)
     } catch {
       case t: IllegalStateException => {
@@ -52,7 +56,7 @@ object WebSocket {
 }
 
 case class WebSocket(o: Options,
-                     webSocket: Option[com.ning.http.client.websocket.WebSocket],
+                     webSocket: Option[com.ning.http.client.ws.WebSocket],
                      isOpen: Boolean,
                      asyncHttpClient: AsyncHttpClient,
                      listeners: ListBuffer[WebSocketListener]) {
@@ -67,9 +71,6 @@ case class WebSocket(o: Options,
     if (!s.startsWith("ws://") && !s.startsWith("wss://")) throw new RuntimeException("Invalid Protocol. Only WebSocket ws:// or wss:// supported" + s)
 
     val b = new WebSocketUpgradeHandler.Builder
-    if (o != null) {
-      b.setMaxTextSize(o.maxMessageSize).setMaxByteSize(o.maxMessageSize).setProtocol(o.protocol)
-    }
 
     listeners.foreach(l => {
       b.addWebSocketListener(l)
@@ -107,13 +108,13 @@ case class WebSocket(o: Options,
 
     if (classOf[TextListener].isAssignableFrom(l.getClass)) {
       wrapper = new TextListenerWrapper(l) {
-        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+        override def onOpen(w: com.ning.http.client.ws.WebSocket) {
           super.onOpen(w)
         }
       }
     } else {
       wrapper = new BinaryListenerWrapper(l) {
-        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+        override def onOpen(w: com.ning.http.client.ws.WebSocket) {
           super.onOpen(w)
         }
       }
@@ -137,13 +138,13 @@ case class WebSocket(o: Options,
 
     if (classOf[TextListener].isAssignableFrom(l.getClass)) {
       wrapper = new TextListenerWrapper(l) {
-        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+        override def onOpen(w: com.ning.http.client.ws.WebSocket) {
           super.onOpen(w)
         }
       }
     } else {
       wrapper = new BinaryListenerWrapper(l) {
-        override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+        override def onOpen(w: com.ning.http.client.ws.WebSocket) {
           super.onOpen(w)
         }
       }
@@ -164,7 +165,7 @@ case class WebSocket(o: Options,
 
     logger.trace("Sending to {}", s)
 
-    webSocket.get.sendTextMessage(s)
+    webSocket.get.sendMessage(s)
     this
   }
 
@@ -183,11 +184,11 @@ case class WebSocket(o: Options,
 
 private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListener with WebSocketCloseCodeReasonListener {
 
-  override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+  override def onOpen(w: com.ning.http.client.ws.WebSocket) {
     l.onOpen
   }
 
-  override def onClose(w: com.ning.http.client.websocket.WebSocket) {
+  override def onClose(w: com.ning.http.client.ws.WebSocket) {
     l.onClose
   }
 
@@ -199,11 +200,9 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
     l.onMessage(s)
   }
 
-  override def onClose(w: com.ning.http.client.websocket.WebSocket, code: Int, reason: String) {
+  override def onClose(w: com.ning.http.client.ws.WebSocket, code: Int, reason: String) {
     l.onClose(code, reason)
   }
-
-  override def onFragment(fragment: String, last: Boolean) {}
 
   override def hashCode() = l.hashCode
 
@@ -217,15 +216,15 @@ private class TextListenerWrapper(l: MessageListener) extends WebSocketTextListe
 
 private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteListener with WebSocketCloseCodeReasonListener {
 
-  override def onOpen(w: com.ning.http.client.websocket.WebSocket) {
+  override def onOpen(w: com.ning.http.client.ws.WebSocket) {
     l.onOpen
   }
 
-  override def onClose(w: com.ning.http.client.websocket.WebSocket) {
+  override def onClose(w: com.ning.http.client.ws.WebSocket) {
     l.onClose
   }
 
-  override def onClose(w: com.ning.http.client.websocket.WebSocket, code: Int, reason: String) {
+  override def onClose(w: com.ning.http.client.ws.WebSocket, code: Int, reason: String) {
     l.onClose(code, reason)
   }
 
@@ -245,7 +244,5 @@ private class BinaryListenerWrapper(l: MessageListener) extends WebSocketByteLis
       case _ => false
     }
   }
-
-  override def onFragment(fragment: Array[Byte], last: Boolean) {}
 }
 
