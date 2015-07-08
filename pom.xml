@@ -9,7 +9,7 @@
     <groupId>org.jfarcand</groupId>
     <artifactId>wcs</artifactId>
     <name>WebSocket Client Library for Scala</name>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4</version>
     <packaging>jar</packaging>
     <description>
         A simple WebSocket Client for Scala
