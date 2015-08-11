@@ -35,7 +35,7 @@ object WebSocket {
   def apply(o: Options): WebSocket = {
     if (o != null) {
       nettyConfig.setWebSocketMaxBufferSize(o.maxMessageSize)
-      nettyConfig.setWebSocketMaxBufferSize(o.maxMessageSize)
+      nettyConfig.setWebSocketMaxFrameSize(o.maxMessageSize)
       config.setRequestTimeout(o.idleTimeout).setUserAgent(o.userAgent).setAsyncHttpClientProviderConfig(nettyConfig)
     }
 
