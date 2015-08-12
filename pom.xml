@@ -118,7 +118,7 @@
                 <version>2.8.1</version>
                 <configuration>
                     <aggregate>true</aggregate>
-                    <source>1.6</source>
+                    <source>1.5</source>
                     <encoding>UTF-8</encoding>
                     <maxmemory>1g</maxmemory>
                     <links>
@@ -286,7 +286,7 @@
             <version>2.8.1</version>
             <configuration>
                 <aggregate>true</aggregate>
-                <source>1.6</source>
+                <source>1.5</source>
                 <encoding>UTF-8</encoding>
                 <maxmemory>1g</maxmemory>
                 <links>
@@ -324,8 +324,8 @@
     <properties>
         <distMgmtSnapshotsUrl>http://oss.sonatype.org/content/repositories/snapshots</distMgmtSnapshotsUrl>
         <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
-        <source.property>1.8</source.property>
-        <target.property>1.8</target.property>
+        <source.property>1.5</source.property>
+        <target.property>1.5</target.property>
     </properties>
 </project>
 
