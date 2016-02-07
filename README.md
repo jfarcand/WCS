@@ -4,14 +4,14 @@ A really simple WebSocket library that works with [node.js](http://nodejs.org/),
 
 ```java
      WebSocket().open("ws://localhost")
-        .listener(new MessageListener {
+        .listener(new TextListener {
             override def onMessage(message: String) {
                 // Do something
             }
         })
         .send("Hello World")
         .send("WebSockets are cool!")
-        .listener(new MessageListener {
+        .listener(new BinaryListener {
             override def onMessage(message: Array[Byte]) {
                 // Do something
             }
